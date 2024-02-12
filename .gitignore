@@ -1,0 +1,5 @@
+.vscode
+.web-extension-id
+web-ext-artifacts/*
+
+_*
