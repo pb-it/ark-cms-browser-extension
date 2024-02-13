@@ -1,5 +1,5 @@
 .vscode
 .web-extension-id
-web-ext-artifacts/*
+web-ext-artifacts/*.zip
 
 _*
