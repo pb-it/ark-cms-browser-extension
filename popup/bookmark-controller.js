@@ -76,29 +76,28 @@ class BookmarkController {
     }
 
     _bChrome;
-    _root;
 
     constructor() {
         this._bChrome = (typeof browser == "undefined");
-        if (this._bChrome)
-            this._root = 'Lesezeichenleiste';
-        else
-            this._root = 'Lesezeichen-Symbolleiste';
     }
 
     async export(url, profile) {
-        const tree = await browser.bookmarks.getTree();
-        var obj = BookmarkController.parse(tree[0]);
-        obj = BookmarkController.searchTree(obj, this._root);
-        const data = {
-            'profile': profile,
-            'dump': JSON.stringify(obj)
+        const toolbar = await browser.bookmarks.getSubTree('toolbar_____');
+        var obj = BookmarkController.parse(toolbar[0]);
+        if (obj) {
+            const data = {
+                'profile': profile,
+                'dump': JSON.stringify(obj)
+            }
+            if (this._bChrome)
+                ;
+            else
+                await HttpClient.request('POST', url, { 'withCredentials': true }, data);
+            window.close();
+        } else {
+            //console.log(JSON.stringify(tmp));
+            alert('Reading current bookmarks failed!');
         }
-        if (this._bChrome)
-            ;
-        else
-            await HttpClient.request('POST', url, { 'withCredentials': true }, data);
-        window.close();
         return Promise.resolve();
     }
 
@@ -112,11 +111,9 @@ class BookmarkController {
                 obj = data[0];
         }
         if (obj) {
-            //console.log(obj['dump']);
-            var tree = await browser.bookmarks.getTree();
-            tree = BookmarkController.searchTree(tree[0], this._root);
-            await BookmarkController.clear(tree);
-            await BookmarkController.create(tree['id'], obj['dump'].children);
+            const toolbar = await browser.bookmarks.getSubTree('toolbar_____');
+            await BookmarkController.clear(toolbar[0]);
+            await BookmarkController.create('toolbar_____', obj['dump'].children);
         }
         window.close();
         return Promise.resolve();
