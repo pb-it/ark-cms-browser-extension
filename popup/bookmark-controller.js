@@ -59,11 +59,18 @@ class BookmarkController {
             var tmp = { parentId: parent };
             if (obj['title'])
                 tmp['title'] = obj['title'];
-            if (obj['url']) {
+            if (obj['uri']) {
+                if (obj['uri'] == 'data:')
+                    tmp['type'] = 'separator';
+                else
+                    tmp['url'] = obj['uri'];
+            } else if (obj['url']) {
                 if (obj['url'] == 'data:')
                     tmp['type'] = 'separator';
                 else
                     tmp['url'] = obj['url'];
+            } else if (obj['typeCode'] == 3 || obj['type'] == 'text/x-moz-place-separator') {
+                tmp['type'] = 'separator';
             }
             var bm = await browser.bookmarks.create(tmp);
             if (obj.children) {
